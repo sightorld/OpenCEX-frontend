@@ -49,6 +49,8 @@
         </div>
       </div>
     </div>
+    <!-- KYC Modal -->
+    <KycTeleportModal :visible="showKycModalVisible" @close="closeKycModal" />
   </div>
 </template>
 
@@ -61,7 +63,7 @@ import WalletHistory from "../components/WalletHistory.vue";
 import WalletDepositSepaFialModal from "../components/modals/WalletDepositSepaFialModal.vue";
 import WalletWithdrawalCryptoAddress from "../components/modals/WalletWithdrawalCryptoAddress.vue";
 import SecurityNoticeModal from "../components/modals/SecurityNoticeModal.vue";
-import KycNoticeModal from "../components/modals/KycNoticeModal.vue";
+import KycTeleportModal from "~/components/modals/KycTeleportModal.vue";
 import InfoModal from "../components/modals/InfoModal.vue";
 import SelectAdvanced from "~/components/ui/SelectAdvanced.vue";
 
@@ -83,6 +85,7 @@ export default {
   components: {
     SelectAdvanced,
     WalletHistory,
+    KycTeleportModal,
   },
   mixins: [getFixedDecimal, copyToBuffer],
   data() {
@@ -101,6 +104,7 @@ export default {
       timers: [],
       resend_loader: {},
       floor10,
+      showKycModalVisible: false,
     };
   },
   computed: {
@@ -409,16 +413,10 @@ export default {
       });
     },
     showKycModal() {
-      this.$modal.show(
-        KycNoticeModal,
-        {},
-        {
-          adaptive: true,
-          height: "auto",
-          scrollable: true,
-          width: 500,
-        }
-      );
+      this.showKycModalVisible = true;
+    },
+    closeKycModal() {
+      this.showKycModalVisible = false;
     },
     formatAmount(amount) {
       return parseFloat(amount) > 0 ? amount : 0;
