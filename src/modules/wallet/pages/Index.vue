@@ -253,6 +253,7 @@ import copyToBuffer from "~/mixins/copyToBuffer";
 import getFixedDecimal from "~/mixins/getFixedDecimal";
 import wallet from "~/mixins/wallet";
 import SecurityNoticeModal from "../components/modals/SecurityNoticeModal.vue";
+import KycNoticeModal from "../components/modals/KycNoticeModal.vue";
 import WalletHistory from "../components/WalletHistory.vue";
 import InfoModal from "../components/modals/InfoModal.vue";
 import WalletDepositSepaFialModal from "../components/modals/WalletDepositSepaFialModal.vue";
@@ -437,6 +438,7 @@ export default {
       this.sortTypeAsc = localStorage.getItem("sort-asc") === "1" || "";
       this.loadWallets();
       this.showSecurityNotice();
+      this.checkKyc();
       this.$store.dispatch("core/getUserNotifications");
       if (this.isConnectedSocket) {
         if (localStorage.getItem("token")) {
@@ -625,6 +627,26 @@ export default {
           }
         });
       }
+    },
+    checkKyc() {
+      this.$http.post("check_kyc/").then((response) => {
+        const isKycNeeded = response.data.kyc_status !== "True";
+        if (isKycNeeded) {
+          this.showKycModal();
+        }
+      });
+    },
+    showKycModal() {
+      this.$modal.show(
+        KycNoticeModal,
+        {},
+        {
+          adaptive: true,
+          height: "auto",
+          scrollable: true,
+          width: 500,
+        }
+      );
     },
     formatAmount(amount) {
       return parseFloat(amount) > 0 ? amount : 0;

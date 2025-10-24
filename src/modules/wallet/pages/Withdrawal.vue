@@ -61,6 +61,7 @@ import WalletHistory from "../components/WalletHistory.vue";
 import WalletDepositSepaFialModal from "../components/modals/WalletDepositSepaFialModal.vue";
 import WalletWithdrawalCryptoAddress from "../components/modals/WalletWithdrawalCryptoAddress.vue";
 import SecurityNoticeModal from "../components/modals/SecurityNoticeModal.vue";
+import KycNoticeModal from "../components/modals/KycNoticeModal.vue";
 import InfoModal from "../components/modals/InfoModal.vue";
 import SelectAdvanced from "~/components/ui/SelectAdvanced.vue";
 
@@ -167,6 +168,7 @@ export default {
       this.$store.dispatch("core/getUserNotifications"),
     ]);
     this.showSecurityNotice();
+    this.checkKyc();
     if (this.isConnectedSocket) {
       if (localStorage.getItem("token")) {
         this.$store.dispatch(
@@ -397,6 +399,26 @@ export default {
           }
         });
       }
+    },
+    checkKyc() {
+      this.$http.post("check_kyc/").then((response) => {
+        const isKycNeeded = response.data.kyc_status !== "True";
+        if (isKycNeeded) {
+          this.showKycModal();
+        }
+      });
+    },
+    showKycModal() {
+      this.$modal.show(
+        KycNoticeModal,
+        {},
+        {
+          adaptive: true,
+          height: "auto",
+          scrollable: true,
+          width: 500,
+        }
+      );
     },
     formatAmount(amount) {
       return parseFloat(amount) > 0 ? amount : 0;
